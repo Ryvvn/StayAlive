@@ -1,0 +1,45 @@
+# BMGD Workflow Status - StayAlive
+# Generated: 2025-12-27
+# Track: Full Game Dev (gamedev)
+# Type: Greenfield
+
+generated: "2025-12-27"
+project: "StayAlive"
+project_type: "Survival Roguelike FPS"
+selected_track: "gamedev"
+field_type: "greenfield"
+workflow_path: "gamedev-greenfield.yaml"
+
+# STATUS KEY:
+# - required/recommended/optional/conditional: Initial status (not started)
+# - {file-path}: Completed with output at path
+# - skipped: Optional/conditional workflow that was skipped
+# - in-progress: Currently being worked on
+
+workflow_status:
+  # Phase 0: Pre-production (Optional)
+  phase-0-preproduction:
+    brainstorm-game: skipped
+    game-brief: \"_bmad-output/game-brief.md\"  # Completed 2025-12-27"
+
+  # Phase 1: Design
+  phase-1-design:
+    gdd: \"_bmad-output/gdd.md\"  # Completed 2025-12-27"
+    narrative: conditional  # if_narrative_focused - determined after GDD
+
+  # Phase 2: Technical
+  phase-2-technical:
+    game-architecture: \"_bmad-output/game-architecture.md\"  # Completed 2025-12-28"
+    test-framework: recommended
+
+  # Phase 3: Production
+  phase-3-production:
+    sprint-planning: required
+    # Note: After sprint-planning, work is tracked in sprint-status.yaml
+
+# Next Workflow
+next:
+  workflow_id: "game-brief"
+  workflow_name: "Create Game Brief"
+  agent: "game-designer"
+  command: "/bmad-bmgd-workflows-create-game-brief"
