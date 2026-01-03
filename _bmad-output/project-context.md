@@ -62,10 +62,12 @@ public void ResultClientRpc(ResultData data) { }
 ```
 NetworkManager (Netcode singleton)
 ├── GameManager (game state, phase, win/loss)
-├── WaveManager (enemy spawning, wave progress)
-├── DayNightManager (time, phase transitions)
+├── WaveManager (enemy spawning, throttling)
+├── DayNightManager (time, lighting, music crossfade)
+├── AudioManager (music layers, bark system)
+├── WorldManager (proc gen, ruins, navmesh)
 ├── InventoryManager (items, crafting per player)
-└── TowerManager (building, power system)
+└── TowerManager (building, power grid graph)
 ```
 
 **Rules:**
@@ -89,10 +91,14 @@ public class GameEvent : ScriptableObject
 ```
 
 **Standard Events to Use:**
-- `OnDayStart`, `OnNightStart`
-- `OnWaveComplete`, `OnWaveStart`
+- `OnDayStart`, `OnNightStart` (Triggers visual/audio shift)
+- `OnWaveComplete`, `OnWaveStart` (Triggers bark/music intensity)
 - `OnPlayerDeath`, `OnPlayerRespawn`
 - `OnTowerBuilt`, `OnTowerDestroyed`
+
+**Bark System Usage:**
+- Use `OnDamageTaken` → Play "Grunt" bark
+- Use `OnReload` → Play "Cover me!" bark
 
 **DO NOT** use `FindObjectOfType<>()` for cross-system communication.
 
@@ -117,6 +123,19 @@ public class EnemyPool : MonoBehaviour
 ```
 
 **DO NOT** use `Instantiate()`/`Destroy()` in hot paths during gameplay.
+
+---
+
+### Novel Patterns (Critical)
+
+**Power Grid System:**
+- Towers must have LOS to Base or Relay to function.
+- `PowerManager` maintains a graph of connected nodes.
+- Towers check connection state throttled (e.g., every 0.5s).
+
+**Vote System:**
+- Post-wave power-up selection via majority vote.
+- `VoteManager` collects votes from clients, applies result on host.
 
 ---
 
@@ -156,7 +175,13 @@ public class EnemyPool : MonoBehaviour
 - NO allocations in Update/FixedUpdate
 - NO LINQ in gameplay code
 - NO string concatenation in loops
+- NO string concatenation in loops
 - Cache component references in Awake()
+
+**AI Throttling (Muck-Style):**
+- Distant enemies update logic every 10-20 frames
+- Disable Animators on non-visible enemies
+- Stop NavMeshAgents when far from players
 
 **Logging in Builds:**
 ```csharp
@@ -211,3 +236,26 @@ Assets/_Project/Scripts/
 | Spawning entities | Object Pool |
 | Balance values | ScriptableObject |
 | Debug logging | `Debug.Log($"[{GetType().Name}]...")` |
+
+---
+
+### Official Asset Sources (Mandatory)
+Use these specific packs to ensure visual consistency and development speed.
+
+**Environment & Props:**
+- **Quaternius Survival Pack** (Trees, Rocks, Build Parts)
+- **Kenney Nature Kit** (Terrain, Foliage)
+
+**Characters & Animations:**
+- **Mixamo** (Y-Bot / SWAT)
+- **Animations:** Rifle Walk, Idle, Run, Jump, Death, Gathering
+
+**Weapons:**
+- **Quaternius Guns Pack** (Pistol, Shotgun, Rifle)
+
+**UI:**
+- **Kenney UI Pack** (Buttons, Panels, Crosshair)
+
+**Audio:**
+- **Kenney Impact & Interface Sounds**
+- **Freesound.org** (Specific SFX)
