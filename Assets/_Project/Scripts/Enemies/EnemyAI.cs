@@ -143,6 +143,17 @@ public class EnemyAI : NetworkBehaviour
             return;
         }
         
+        // Check if agent is on NavMesh
+        if (!_agent.isOnNavMesh)
+        {
+            // Try to warp agent to nearest NavMesh position
+            if (UnityEngine.AI.NavMesh.SamplePosition(transform.position, out UnityEngine.AI.NavMeshHit hit, 5f, UnityEngine.AI.NavMesh.AllAreas))
+            {
+                _agent.Warp(hit.position);
+            }
+            return;
+        }
+        
         float distance = Vector3.Distance(transform.position, _currentTarget.position);
         
         // Check if in attack range

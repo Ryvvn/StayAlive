@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 52e4df2403758a149ae1bb9c2524b6fc, type: 3}
   m_Name: Item_Stone
   m_EditorClassIdentifier: 
-  ItemName: New Item
-  Description: 
+  ItemName: Stone
+  Description: Raw stone from rocks
   Icon: {fileID: 0}
   Type: 0
   Rarity: 0

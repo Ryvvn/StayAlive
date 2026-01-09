@@ -28,6 +28,9 @@ public class NetworkGameManager : MonoBehaviour
     [Header("Network Settings")]
     [SerializeField] private ushort _defaultPort = 7777;
     [SerializeField] private int _maxPlayers = 4;
+    
+    [Header("Player")]
+    [SerializeField] private GameObject _playerPrefab; // Assign this in Inspector
     #endregion
 
     #region State
@@ -36,6 +39,9 @@ public class NetworkGameManager : MonoBehaviour
     public bool IsClient => NetworkManager.Singleton?.IsClient == true;
     public bool IsConnected => NetworkManager.Singleton?.IsConnectedClient == true;
     public int ConnectedPlayerCount => NetworkManager.Singleton?.ConnectedClients?.Count ?? 0;
+    
+    // Store player prefab so LobbyManager can access it for manual spawning
+    public GameObject PlayerPrefab => _playerPrefab;
     #endregion
 
     #region Events
@@ -86,11 +92,17 @@ public class NetworkGameManager : MonoBehaviour
                 transport.SetConnectionData("0.0.0.0", _defaultPort);
             }
 
+            // Disable auto player spawn - we'll spawn manually after scene load
+            NetworkManager.Singleton.NetworkConfig.PlayerPrefab = null;
+            
             // Start host
             bool success = NetworkManager.Singleton.StartHost();
             
             if (success)
             {
+                // Spawn LobbyManager dynamically (avoids memory leak from scene object)
+                SpawnLobbyManager();
+                
                 // Generate simple join code (IP:Port for now, can use relay later)
                 CurrentJoinCode = GenerateJoinCode();
                 Debug.Log($"[NetworkGameManager] Host started. Join Code: {CurrentJoinCode}");
@@ -237,13 +249,128 @@ public class NetworkGameManager : MonoBehaviour
     private void HandleClientConnected(ulong clientId)
     {
         Debug.Log($"[NetworkGameManager] Client connected: {clientId}");
-        OnClientConnected?.Invoke();
+        
+        // Only fire event for local client connection
+        if (NetworkManager.Singleton != null && 
+            clientId == NetworkManager.Singleton.LocalClientId)
+        {
+            OnClientConnected?.Invoke();
+        }
     }
 
     private void HandleClientDisconnected(ulong clientId)
     {
         Debug.Log($"[NetworkGameManager] Client disconnected: {clientId}");
-        OnClientDisconnected?.Invoke();
+        
+        // Check if WE were disconnected (not just another player)
+        if (NetworkManager.Singleton == null || 
+            clientId == NetworkManager.Singleton.LocalClientId ||
+            !NetworkManager.Singleton.IsConnectedClient)
+        {
+            // We got disconnected
+            HandleLocalDisconnect("Connection lost");
+        }
+        else
+        {
+            // Another player disconnected
+            OnClientDisconnected?.Invoke();
+        }
+    }
+    #endregion
+
+    #region Disconnect Handling
+    /// <summary>
+    /// Handle local client being disconnected from the network.
+    /// </summary>
+    private void HandleLocalDisconnect(string reason)
+    {
+        Debug.LogWarning($"[NetworkGameManager] Local disconnect: {reason}");
+        
+        // Clean up
+        CurrentJoinCode = null;
+        
+        // Fire event for UI to show popup
+        OnConnectionFailed?.Invoke(reason);
+        
+        // Return to main menu after a short delay
+        Invoke(nameof(ReturnToMainMenu), 0.5f);
+    }
+    
+    /// <summary>
+    /// Safely return to main menu scene.
+    /// </summary>
+    public void ReturnToMainMenu()
+    {
+        // Ensure network is shut down
+        if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsListening)
+        {
+            NetworkManager.Singleton.Shutdown();
+        }
+        
+        // Unlock cursor for menu
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+        
+        // Load main menu
+        UnityEngine.SceneManagement.SceneManager.LoadScene("MainMenu");
+        Debug.Log("[NetworkGameManager] Returned to Main Menu");
+    }
+    
+    /// <summary>
+    /// Force disconnect with reason (for timeout, kick, etc.)
+    /// </summary>
+    public void ForceDisconnect(string reason)
+    {
+        HandleLocalDisconnect(reason);
+    }
+    #endregion
+    
+    #region LobbyManager Spawning
+    private GameObject _lobbyManagerInstance;
+    
+    /// <summary>
+    /// Spawns LobbyManager dynamically when hosting.
+    /// This avoids memory leaks from NetworkList in scene objects.
+    /// </summary>
+    private void SpawnLobbyManager()
+    {
+        // Don't spawn if already exists
+        if (LobbyManager.Instance != null)
+        {
+            Debug.Log("[NetworkGameManager] LobbyManager already exists");
+            return;
+        }
+        
+        // Create LobbyManager GameObject
+        _lobbyManagerInstance = new GameObject("LobbyManager");
+        _lobbyManagerInstance.transform.SetParent(transform);
+        
+        // Add NetworkObject (required for NetworkBehaviour)
+        var networkObj = _lobbyManagerInstance.AddComponent<NetworkObject>();
+        
+        // Add LobbyManager
+        _lobbyManagerInstance.AddComponent<LobbyManager>();
+        
+        // Spawn on network (as server object, not player object)
+        networkObj.Spawn();
+        
+        Debug.Log("[NetworkGameManager] LobbyManager spawned dynamically");
+    }
+    
+    /// <summary>
+    /// Cleanup LobbyManager when disconnecting.
+    /// </summary>
+    private void CleanupLobbyManager()
+    {
+        if (_lobbyManagerInstance != null)
+        {
+            if (_lobbyManagerInstance.TryGetComponent<NetworkObject>(out var netObj) && netObj.IsSpawned)
+            {
+                netObj.Despawn();
+            }
+            Destroy(_lobbyManagerInstance);
+            _lobbyManagerInstance = null;
+        }
     }
     #endregion
 }

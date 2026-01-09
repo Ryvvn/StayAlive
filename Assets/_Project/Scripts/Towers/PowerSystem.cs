@@ -41,6 +41,7 @@ public class PowerSystem : NetworkBehaviour
     public NetworkVariable<int> UpgradeLevel = new(0);
     
     private List<TowerController> _connectedTowers = new();
+    private List<PowerRelay> _connectedRelays = new();
     private List<LineRenderer> _powerLines = new();
     #endregion
 
@@ -80,16 +81,44 @@ public class PowerSystem : NetworkBehaviour
 
     #region Power Radius
     /// <summary>
-    /// Check if a position is within power range.
+    /// Check if a position is within power range (base or any powered relay).
     /// </summary>
     public bool IsInPowerRange(Vector3 position)
     {
-        float distance = Vector3.Distance(transform.position, position);
-        return distance <= CurrentPowerRadius.Value;
+        return IsPositionPowered(position, excludeRelay: null);
     }
 
     /// <summary>
-    /// Check if a tower placement is valid (within power range).
+    /// Check if position is powered, optionally excluding a specific relay.
+    /// Used to prevent relay from powering itself.
+    /// </summary>
+    public bool IsPositionPowered(Vector3 position, PowerRelay excludeRelay)
+    {
+        // Check base power
+        float distToBase = Vector3.Distance(transform.position, position);
+        if (distToBase <= CurrentPowerRadius.Value)
+        {
+            return true;
+        }
+        
+        // Check powered relays
+        foreach (var relay in _connectedRelays)
+        {
+            if (relay == null || relay == excludeRelay) continue;
+            if (!relay.IsPowered.Value) continue;
+            
+            float distToRelay = Vector3.Distance(relay.Position, position);
+            if (distToRelay <= relay.PowerRadius)
+            {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+
+    /// <summary>
+    /// Check if a tower/building placement is valid (within power range).
     /// </summary>
     public bool CanPlaceTower(Vector3 position)
     {
@@ -142,6 +171,25 @@ public class PowerSystem : NetworkBehaviour
         {
             OnTowerDisconnected?.Invoke(tower);
             Debug.Log($"[PowerSystem] Tower unregistered. Total: {_connectedTowers.Count}");
+        }
+    }
+    #endregion
+
+    #region Relay Registration
+    public void RegisterRelay(PowerRelay relay)
+    {
+        if (!_connectedRelays.Contains(relay))
+        {
+            _connectedRelays.Add(relay);
+            Debug.Log($"[PowerSystem] Relay registered. Total relays: {_connectedRelays.Count}");
+        }
+    }
+
+    public void UnregisterRelay(PowerRelay relay)
+    {
+        if (_connectedRelays.Remove(relay))
+        {
+            Debug.Log($"[PowerSystem] Relay unregistered. Total relays: {_connectedRelays.Count}");
         }
     }
     #endregion

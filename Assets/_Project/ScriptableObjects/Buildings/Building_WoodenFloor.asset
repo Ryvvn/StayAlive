@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 804e8ec62dd9bb24d87cfbcdbdc2e30e, type: 3}
+  m_Name: Building_WoodenFloor
+  m_EditorClassIdentifier: 
+  PieceName: Wooden Floor
+  Description: A wooden floor tile
+  Icon: {fileID: 0}
+  Category: 0
+  Prefab: {fileID: 37573000758049791, guid: 091146bdc09499e46903138568ae125e, type: 3}
+  PreviewPrefab: {fileID: 0}
+  GridSize: {x: 2, y: 0.1, z: 2}
+  CanRotate: 1
+  RotationStep: 90
+  SnapToGrid: 1
+  GridSnapSize: 1
+  Costs:
+  - Item: {fileID: 11400000, guid: edb7624fb7a685648a41ddf5589cf75a, type: 2}
+    Quantity: 4
+  MaxHealth: 80
+  IsFoundation: 1
+  RequiresFoundation: 0

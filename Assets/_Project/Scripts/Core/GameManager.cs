@@ -39,7 +39,10 @@ public class GameManager : NetworkBehaviour
     [Header("Manager References")]
     [SerializeField] private DayNightManager _dayNightManager;
     [SerializeField] private WaveManager _waveManager;
-    //[SerializeField] private TowerManager _towerManager;
+    
+    [Header("Auto Start")]
+    [SerializeField] private bool _autoStartGame = true;
+    [SerializeField] private float _autoStartDelay = 2f; // Wait for all players to load
     #endregion
 
     #region Unity Lifecycle
@@ -52,8 +55,23 @@ public class GameManager : NetworkBehaviour
         
         if (IsServer)
         {
-            Debug.Log($"[GameManager] Server spawned. Starting game...");
+            Debug.Log($"[GameManager] Server spawned. Auto-start: {_autoStartGame}");
+            
+            if (_autoStartGame)
+            {
+                StartCoroutine(AutoStartGameCoroutine());
+            }
         }
+    }
+
+    private System.Collections.IEnumerator AutoStartGameCoroutine()
+    {
+        // Wait for other managers to initialize and players to spawn
+        yield return new WaitForSeconds(_autoStartDelay);
+        
+        Debug.Log("[GameManager] Auto-starting game...");
+        CurrentWave.Value = 1;
+        TransitionToPhase(GamePhase.Day);
     }
 
     public override void OnNetworkDespawn()

@@ -1,0 +1,25 @@
+{
+    "name": "StayAlive.Game",
+    "rootNamespace": "",
+    "references": [
+        "Unity.Netcode.Runtime",
+        "Unity.TextMeshPro",
+        "Unity.InputSystem",
+        "Unity.Collections",
+        "Unity.Networking.Transport",
+        "Unity.Networking.ClientServer",
+        "Unity.Netcode",
+        "Unity.Netcode.Components",
+        "UnityEngine.AI",
+        "Unity.AI.Navigation"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

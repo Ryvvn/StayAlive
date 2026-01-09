@@ -30,16 +30,16 @@ workflow_status:
   # Phase 2: Technical
   phase-2-technical:
     game-architecture: \"_bmad-output/game-architecture.md\"  # Completed 2025-12-28"
-    test-framework: recommended
+    test-framework: \"Assets/Tests/README.md\"  # Completed 2026-01-04
 
   # Phase 3: Production
   phase-3-production:
-    sprint-planning: required
+    sprint-planning: \"_bmad-output/implementation-artifacts/sprint-status.yaml\"  # Completed 2026-01-04
     # Note: After sprint-planning, work is tracked in sprint-status.yaml
 
 # Next Workflow
 next:
-  workflow_id: "game-brief"
-  workflow_name: "Create Game Brief"
-  agent: "game-designer"
-  command: "/bmad-bmgd-workflows-create-game-brief"
+  workflow_id: "sprint-planning"
+  workflow_name: "Sprint Planning"
+  agent: "game-scrum-master"
+  command: "/bmad-bmgd-workflows-sprint-planning"

@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 804e8ec62dd9bb24d87cfbcdbdc2e30e, type: 3}
+  m_Name: Building_WoodenDoor
+  m_EditorClassIdentifier: 
+  PieceName: Wooden Door
+  Description: A wooden door
+  Icon: {fileID: 0}
+  Category: 1
+  Prefab: {fileID: 400571313710338382, guid: 1e4a496343856b24594dc26a80781485, type: 3}
+  PreviewPrefab: {fileID: 0}
+  GridSize: {x: 1, y: 2.5, z: 0.15}
+  CanRotate: 1
+  RotationStep: 90
+  SnapToGrid: 1
+  GridSnapSize: 1
+  Costs:
+  - Item: {fileID: 11400000, guid: edb7624fb7a685648a41ddf5589cf75a, type: 2}
+    Quantity: 4
+  MaxHealth: 100
+  IsFoundation: 0
+  RequiresFoundation: 0

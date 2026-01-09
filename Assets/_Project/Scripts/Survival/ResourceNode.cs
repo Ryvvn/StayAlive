@@ -5,7 +5,7 @@ using UnityEngine;
 /// Resource node that players can gather from.
 /// Examples: Trees, rocks, bushes
 /// </summary>
-public class ResourceNode : NetworkBehaviour
+public class ResourceNode : NetworkBehaviour, IInteractable
 {
     #region Configuration
     [Header("Resource Info")]
@@ -163,8 +163,17 @@ public class ResourceNode : NetworkBehaviour
     }
     #endregion
 
-    #region Interaction
-    public bool CanGather => !IsDepleted.Value;
-    public float GetGatherProgress() => 0f; // TODO: Implement hold-to-gather
+    #region IInteractable Implementation
+    public string InteractionPrompt => $"Gather {_resourceName}";
+    public bool CanInteract => !IsDepleted.Value;
+    public float InteractionTime => _gatherTime;
+    
+    public void Interact(PlayerInteraction player)
+    {
+        if (!CanInteract) return;
+        
+        // Call server to perform gather
+        GatherServerRpc();
+    }
     #endregion
 }

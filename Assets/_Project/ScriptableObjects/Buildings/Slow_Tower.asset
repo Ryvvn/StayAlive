@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 804e8ec62dd9bb24d87cfbcdbdc2e30e, type: 3}
+  m_Name: Slow_Tower
+  m_EditorClassIdentifier: 
+  PieceName: Slow Tower
+  Description: Slows enemies in range
+  Icon: {fileID: 0}
+  Category: 2
+  Prefab: {fileID: 1293262223827164429, guid: 18120652c60b2c64c92845a76e672e1c, type: 3}
+  PreviewPrefab: {fileID: 0}
+  GridSize: {x: 1, y: 1, z: 1}
+  CanRotate: 1
+  RotationStep: 45
+  SnapToGrid: 1
+  GridSnapSize: 2
+  Costs: []
+  MaxHealth: 80
+  IsFoundation: 0
+  RequiresFoundation: 0
+  RequiresPower: 1
+  IsPowerRelay: 0
+  IsTower: 1
